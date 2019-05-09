@@ -93,10 +93,15 @@ void Settings::load() {
 void Settings::reset() {
   if (debug) Serial.print("reset settings...");
 
-  ssid = "pwned";
-  password = "deauther"; //must have at least 8 characters
+   ssid = "KupalKa";
+  password = "secret123"; //must have at least 8 characters
   ssidHidden = false;
   apChannel = 1;
+
+//  ssid = "pwned";
+//  password = "deauther"; //must have at least 8 characters
+//  ssidHidden = false;
+//  apChannel = 1;
 
   ssidLen = ssid.length();
   passwordLen = password.length();

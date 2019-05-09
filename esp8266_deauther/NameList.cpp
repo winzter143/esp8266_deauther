@@ -70,7 +70,9 @@ String NameList::getByMac(Mac client) {
   int clientNum = clients.getNum(client);
   if (clientNum > -1) {
     for (int h = 0; h < nameLength; h++) {
-      if (names[clientNum][h] != 0x00) returnStr += (char)names[clientNum][h];
+      if (names[clientNum][h] != 0x00){
+        returnStr += (char)names[clientNum][h];
+      }
     }
   }
 return returnStr;

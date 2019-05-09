@@ -62,6 +62,16 @@ class Attack
     //attack declarations
     const String attackNames[attacksNum] = {"Deauth", "Beacon", "Probe-Request"};
 
+    /**
+     * Attack mechanism.
+     */
+    const int attackMechanism[3][2] ={
+      {15, 5},
+      {10, 3},
+      {5, 1}
+    };
+    
+
     //attack infos
     String stati[attacksNum];
     unsigned int packetsCounter[attacksNum];

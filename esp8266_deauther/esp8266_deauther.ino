@@ -242,7 +242,9 @@ void startClientScan() {
     server.send(200, "text/json", "true");
     clientScan.start(server.arg("time").toInt());
     attack.stopAll();
-  } else server.send( 200, "text/json", "Error: no selected access point");
+  } else {
+    server.send( 200, "text/json", "Error: no selected access point");
+  }
 }
 
 void sendClientResults() {
@@ -266,7 +268,9 @@ void addClientFromList(){
     clientScan.add(nameList.getMac(_num));
     
     server.send( 200, "text/json", "true");
-  }else server.send( 200, "text/json", "false");
+  }else {
+    server.send( 200, "text/json", "false");
+  }
 }
 
 void setClientName() {
@@ -275,7 +279,9 @@ void setClientName() {
       nameList.add(clientScan.getClientMac(server.arg("id").toInt()), server.arg("name"));
       server.send( 200, "text/json", "true");
     }
-    else server.send( 200, "text/json", "false");
+    else {
+      server.send( 200, "text/json", "false");
+    }
   }
 }
 
@@ -480,6 +486,9 @@ void resetSettings() {
   server.send( 200, "text/json", "true" );
 }
 
+/**
+ * START setup Adruino Func
+ */
 void setup() {
 
   randomSeed(os_random());
@@ -606,7 +615,12 @@ void setup() {
 #endif
   }
 }
+// END Setup Adruino
+// ===================================================
 
+/**
+ * Start the Infinity loop/process
+ */
 void loop() {
   if (clientScan.sniffing) {
     if (clientScan.stop()) startWifi();
@@ -707,4 +721,4 @@ void loop() {
   drawInterface();
 #endif
 
-}
+} // END LOOP

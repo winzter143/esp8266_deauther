@@ -6,7 +6,7 @@ APScan::APScan() {
 
 bool APScan::start() {
   if (debug) {
-    Serial.println("starting AP scan...");
+    Serial.println("APScan::start starting AP scan...");
     Serial.println("MAC - Ch - RSSI - Encrypt. - SSID - Hidden");// - Vendor");
   }
   aps._clear();
